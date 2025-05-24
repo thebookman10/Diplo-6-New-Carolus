@@ -1,876 +1,860 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2566">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCAF Military Organization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #ff6b35;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto; /* Allow horizontal scrolling if content is too wide */
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: #ff6b35;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        .star:nth-child(odd) {
+            animation-delay: 1s;
+        }
+
+        .star:nth-child(3n) {
+            animation-delay: 2s;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.8; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            min-width: 2200px; /* Increased min-width for a much wider layout */
+            width: 100%;
+            max-width: 2500px; /* Set a max-width to prevent excessive width on huge screens */
+            margin: 0 auto; /* Center the container */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 2px solid #ff6b35;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2em;
+            text-shadow: 0 0 10px #ff6b35;
+            margin-bottom: 8px;
+        }
+
+        .header h2 {
+            font-size: 1.2em;
+            color: #ffaa80;
+            margin-bottom: 10px;
+        }
+
+        .commander {
+            background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+            color: #000;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .org-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .main-level {
+            display: flex;
+            justify-content: center;
+            gap: 150px; /* Significantly increased gap for wider separation */
+            width: 100%;
+            margin-top: 20px;
+            flex-wrap: nowrap; /* Prevent wrapping at this level for wider layout */
+        }
+
+        .branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            min-width: 500px; /* Adjusted min-width for branches to accommodate wider content */
+            margin-bottom: 20px;
+        }
+
+        .unit {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 2px solid #ff6b35;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.2);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 420px; /* Adjusted max-width for units */
+            cursor: pointer;
+        }
+
+        .unit.collapsible::after {
+            content: '▼';
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            color: #ff6b35;
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .unit.collapsed::after {
+            transform: rotate(-90deg);
+        }
+
+        .unit.no-children {
+            cursor: default;
+        }
+
+        .unit.no-children::after {
+            display: none;
+        }
+
+        .collapsible-section {
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out; /* Smoother transition */
+            overflow: hidden;
+            max-height: 0; /* Default collapsed state */
+            opacity: 0;
+            padding: 0;
+            margin: 0; /* Remove margin/padding when collapsed */
+        }
+        .collapsible-section.expanded {
+            max-height: 1000px; /* Arbitrary large value for expansion */
+            opacity: 1;
+            margin-top: 15px; /* Add margin when expanded */
+        }
+
+        .unit:hover {
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .unit-title {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #ff6b35;
+            text-shadow: 0 0 5px #ff6b35;
+        }
+
+        .unit-name {
+            font-size: 0.9em;
+            color: #ffaa80;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .unit-rank {
+            font-size: 0.8em;
+            color: #ffaa80;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .unit-description {
+            font-size: 0.75em;
+            color: #ccc;
+            line-height: 1.3;
+        }
+
+        .main-branch-unit { /* Renamed from .main-branch to avoid conflict with .branch */
+            background: linear-gradient(135deg, #2a1a0a, #3a2a1a);
+            border-color: #ff8f5a;
+            max-width: 460px; /* Adjusted max-width for main branch units */
+        }
+
+        .sub-level {
+            display: flex;
+            gap: 30px; /* Increased gap for wider sub-levels */
+            flex-wrap: wrap; /* Allow wrapping within sub-levels */
+            justify-content: center;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .sub-unit {
+            background: linear-gradient(135deg, #151515, #252525);
+            border-color: #cc5528;
+            max-width: 320px; /* Adjusted max-width for sub-units */
+            min-width: 250px; /* Adjusted min-width for sub-units */
+            flex: 1;
+        }
+
+        .sub-sub-level {
+            display: flex;
+            gap: 20px; /* Increased gap for wider sub-sub-levels */
+            flex-wrap: wrap; /* Allow wrapping within sub-sub-levels */
+            justify-content: center;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .sub-sub-unit {
+            background: linear-gradient(135deg, #0f0f0f, #1f1f1f);
+            border-color: #aa4420;
+            max-width: 240px; /* Adjusted max-width for sub-sub-units */
+            min-width: 200px; /* Adjusted min-width for sub-sub-units */
+            font-size: 0.9em;
+            flex: 1;
+        }
+
+        .connection-line {
+            width: 3px; /* Thicker line */
+            height: 30px; /* Longer vertical line */
+            background: linear-gradient(to bottom, #ff6b35, #cc5528);
+            margin: 0 auto;
+        }
+
+        .horizontal-connections {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            margin: 20px 0; /* Increased margin */
+        }
+
+        .horizontal-line {
+            height: 3px; /* Thicker line */
+            background: linear-gradient(to right, #ff6b35, #cc5528);
+            flex: 1;
+            max-width: 180px; /* Adjusted max-width for horizontal lines */
+        }
+
+        .connection-node {
+            width: 10px; /* Larger node */
+            height: 10px; /* Larger node */
+            background: #ff6b35;
+            border-radius: 50%;
+            margin: 0 15px; /* Increased margin */
+            box-shadow: 0 0 8px #ff6b35; /* Stronger glow */
+        }
+
+        .diamond {
+            display: inline-block;
+            color: #ff6b35;
+            text-shadow: 0 0 5px #ff6b35;
+        }
+
+        .naval-section {
+            flex: 2;
+        }
+
+        .dlc-section {
+            flex: 1;
+        }
+        
+        /* Media queries for responsiveness */
+        @media (max-width: 2200px) { /* Adjust container min-width for larger screens */
+            .container {
+                min-width: 1600px;
+            }
+        }
+        @media (max-width: 1600px) { /* Tablet breakpoint */
+            .container {
+                min-width: 1200px;
+            }
+            .main-level {
+                gap: 80px;
+            }
+            .branch {
+                min-width: 380px;
+            }
+            .unit {
+                max-width: 340px;
+            }
+            .main-branch-unit {
+                max-width: 380px;
+            }
+            .sub-level, .sub-sub-level {
+                gap: 20px;
+            }
+            .sub-unit {
+                max-width: 250px;
+                min-width: 200px;
+            }
+            .sub-sub-unit {
+                max-width: 180px;
+                min-width: 160px;
+            }
+            .horizontal-line {
+                max-width: 100px;
+            }
+        }
+        @media (max-width: 1200px) { /* Smaller Tablet breakpoint */
+            .container {
+                min-width: 900px;
+            }
+            .main-level {
+                gap: 40px;
+            }
+            .branch {
+                min-width: 280px;
+            }
+            .unit {
+                max-width: 260px;
+            }
+            .main-branch-unit {
+                max-width: 300px;
+            }
+            .sub-level, .sub-sub-level {
+                gap: 15px;
+            }
+            .sub-unit {
+                max-width: 180px;
+                min-width: 140px;
+            }
+            .sub-sub-unit {
+                max-width: 130px;
+                min-width: 110px;
+            }
+            .horizontal-line {
+                max-width: 60px;
+            }
+        }
+        @media (max-width: 768px) { /* Mobile breakpoint */
+            .container {
+                min-width: unset; /* Remove min-width on small screens */
+                padding: 10px;
+            }
+            .main-level {
+                flex-direction: column;
+                gap: 40px;
+                align-items: center;
+            }
+            .branch {
+                width: 100%;
+                max-width: 400px;
+            }
+            .unit {
+                max-width: 100%;
+            }
+            .sub-level, .sub-sub-level {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .horizontal-connections {
+                flex-direction: column;
+                margin: 20px 0;
+            }
+            .horizontal-line {
+                width: 3px;
+                height: 30px;
+                margin: 10px auto;
+            }
+            .connection-node {
+                margin: 10px 0;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 2px solid #ff6b35;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+            padding: 25px;
+            width: 90%;
+            max-width: 700px;
+            color: #ffaa80;
+            position: relative;
+            animation: fadeInScale 0.3s ease-out;
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #ff6b35;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .modal-close-button:hover {
+            color: #ffaa80;
+        }
+        .modal-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ff6b35;
+        }
+        .modal-body {
+            font-size: 1em;
+            line-height: 1.5;
+            color: #ccc;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px; /* For scrollbar space */
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #ff6b35;
+            border-radius: 10px;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ff6b35;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .llm-button {
+            background: linear-gradient(135deg, #ff8f5a, #ff6b35);
+            color: #1a1a1a;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .llm-button:hover {
+            background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;NCAF Military Organization&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>* {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #0a0a0a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Courier New', monospace;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow-x: auto; /* Allow horizontal scrolling if content is too wide */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stars {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: fixed;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.star {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0.6;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: twinkle 3s infinite alternate;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.star:nth-child(odd) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation-delay: 1s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.star:nth-child(3n) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation-delay: 2s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes twinkle {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>0% { opacity: 0.3; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>100% { opacity: 0.8; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-width: 2200px; /* Increased min-width for a much wider layout */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 2500px; /* Set a max-width to prevent excessive width on huge screens */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto; /* Center the container */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 30px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #1a1a1a, #2a2a2a);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header h1 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 2em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 0 0 10px #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header h2 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.2em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffaa80;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.commander {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #ff6b35, #ff8f5a);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 300px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.org-chart {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.main-level {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 150px; /* Significantly increased gap for wider separation */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: nowrap; /* Prevent wrapping at this level for wider layout */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.branch {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-width: 500px; /* Adjusted min-width for branches to accommodate wider content */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #1a1a1a, #2a2a2a);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 10px rgba(255, 107, 53, 0.2);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s ease;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 420px; /* Adjusted max-width for units */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit.collapsible::after {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>content: '▼';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>right: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 0.3s ease;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit.collapsed::after {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: rotate(-90deg);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit.no-children {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: default;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit.no-children::after {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.collapsible-section {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: max-height 0.5s ease-out, opacity 0.5s ease-out; /* Smoother transition */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-height: 0; /* Default collapsed state */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0; /* Remove margin/padding when collapsed */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.collapsible-section.expanded {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-height: 1000px; /* Arbitrary large value for expansion */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 15px; /* Add margin when expanded */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-2px);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit-title {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 0 0 5px #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit-name {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.9em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffaa80;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit-rank {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.8em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffaa80;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-style: italic;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.unit-description {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.75em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ccc;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>line-height: 1.3;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.main-branch-unit { /* Renamed from .main-branch to avoid conflict with .branch */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #2a1a0a, #3a2a1a);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #ff8f5a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 460px; /* Adjusted max-width for main branch units */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sub-level {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 30px; /* Increased gap for wider sub-levels */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap; /* Allow wrapping within sub-levels */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sub-unit {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #151515, #252525);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #cc5528;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 320px; /* Adjusted max-width for sub-units */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-width: 250px; /* Adjusted min-width for sub-units */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sub-sub-level {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 20px; /* Increased gap for wider sub-sub-levels */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap; /* Allow wrapping within sub-sub-levels */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sub-sub-unit {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #0f0f0f, #1f1f1f);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #aa4420;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 240px; /* Adjusted max-width for sub-sub-units */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-width: 200px; /* Adjusted min-width for sub-sub-units */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.9em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.connection-line {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 3px; /* Thicker line */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 30px; /* Longer vertical line */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(to bottom, #ff6b35, #cc5528);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.horizontal-connections {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 20px 0; /* Increased margin */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.horizontal-line {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 3px; /* Thicker line */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(to right, #ff6b35, #cc5528);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 180px; /* Adjusted max-width for horizontal lines */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.connection-node {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 10px; /* Larger node */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 10px; /* Larger node */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 15px; /* Increased margin */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 8px #ff6b35; /* Stronger glow */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.diamond {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 0 0 5px #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.naval-section {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 2;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.dlc-section {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Media queries for responsiveness */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 2200px) { /* Adjust container min-width for larger screens */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 1600px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 1600px) { /* Tablet breakpoint */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 1200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.main-level {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>gap: 80px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.branch {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 380px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 340px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.main-branch-unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 380px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.sub-level, .sub-sub-level {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>gap: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.sub-unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 250px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.sub-sub-unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 180px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 160px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.horizontal-line {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 100px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 1200px) { /* Smaller Tablet breakpoint */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 900px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.main-level {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>gap: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.branch {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 280px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 260px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.main-branch-unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 300px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.sub-level, .sub-sub-level {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.sub-unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 180px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 140px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.sub-sub-unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 130px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: 110px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.horizontal-line {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 60px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 768px) { /* Mobile breakpoint */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>min-width: unset; /* Remove min-width on small screens */</p>
-<p class="p1"><span class="Apple-converted-space">                </span>padding: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.main-level {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>gap: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.branch {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.unit {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>max-width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.sub-level, .sub-sub-level {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.horizontal-connections {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>margin: 20px 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.horizontal-line {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>width: 3px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>height: 30px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>margin: 10px auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.connection-node {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>margin: 10px 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Modal Styles */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-overlay {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: fixed;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: rgba(0, 0, 0, 0.7);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>visibility: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: opacity 0.3s ease, visibility 0.3s ease;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-overlay.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>visibility: visible;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-content {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #1a1a1a, #2a2a2a);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 25px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 90%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 700px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffaa80;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: fadeInScale 0.3s ease-out;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes fadeInScale {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>from { opacity: 0; transform: scale(0.9); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>to { opacity: 1; transform: scale(1); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-close-button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>right: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.5em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: color 0.2s ease;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-close-button:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffaa80;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-title {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.8em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 0 0 5px #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>line-height: 1.5;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ccc;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-height: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow-y: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding-right: 10px; /* For scrollbar space */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-body::-webkit-scrollbar {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-body::-webkit-scrollbar-track {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #333;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-body::-webkit-scrollbar-thumb {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.loading-spinner {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 4px solid rgba(255, 255, 255, 0.3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-top: 4px solid #ff6b35;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 30px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 30px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: spin 1s linear infinite;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 20px auto;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes spin {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>0% { transform: rotate(0deg); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>100% { transform: rotate(360deg); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.llm-button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #ff8f5a, #ff6b35);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.2s ease;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: inline-flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.llm-button:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #ff6b35, #ff8f5a);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-1px);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="stars" id="stars"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1&gt;UNITED LABOR COLONIES OF DEMOCRATIC NEW CAROLUS&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;NEW CAROLEAN ARMED FORCES (NCAF)&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="commander"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="unit-title"&gt;COMMANDER-IN-CHIEF&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="unit-name"&gt;Viceroy Elreon Vyre&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="unit-rank"&gt;&lt;span class="diamond"&gt;🔻&lt;/span&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="org-chart"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="connection-line"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="main-level"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="branch" style="flex: unset; min-width: unset;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="unit main-branch-unit collapsible" data-target="ncaf-main-content" id="ncaf-node"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="unit-title"&gt;NEW CAROLEAN ARMED FORCES&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="unit-rank"&gt;(NCAF)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="unit-description"&gt;The primary military arm, responsible for all armed forces operations.&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button class="llm-button" data-unit="NCAF"&gt;✨ Get Strategic Insight&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="collapsible-section collapsed" id="ncaf-main-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="connection-line"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="main-level" style="gap: 60px; margin-top: 0;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="branch naval-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="unit main-branch-unit collapsible" data-target="naval-command-content" id="ncnc-node"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="unit-title"&gt;NEW CAROLEAN NAVAL COMMAND&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="unit-name"&gt;First Voidlord Jhon Yarthaed&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="unit-rank"&gt;(NCNC)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="unit-description"&gt;Primary spacefaring military arm responsible for orbital and deep-space operations&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button class="llm-button" data-unit="NCNC"&gt;✨ Get Strategic Insight&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                </span></p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="collapsible-section collapsed" id="naval-command-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="connection-line"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="unit main-branch-unit collapsible" data-target="high-admiralty-content" id="high-admiralty-node"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="unit-title"&gt;HIGH ADMIRALTY&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="unit-name"&gt;Grand Admiral Célestine Beaufort&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="unit-rank"&gt;Strategic Command&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="unit-description"&gt;Strategic executive body overseeing all naval operations&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="collapsible-section collapsed" id="high-admiralty-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="connection-line"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="sub-level" style="flex-wrap: nowrap; justify-content: center; align-items: flex-start;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-title"&gt;ORBITAL DEFENCE FORCE&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-rank"&gt;(ODF)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-description"&gt;Defense of core worlds and orbital installations&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                            </span></p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit sub-unit collapsible" data-target="ncef-section" id="ncef-node"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-title"&gt;NEW CAROLEAN NAVY&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-rank"&gt;EXPEDITIONARY FORCES (NCEF)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-description"&gt;Fleet-based power projection and planetary control&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                            </span></p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-title"&gt;ASTROCARTOGRAPHY BUREAU&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-name"&gt;Honorable Cartographer Jo Kōdōha&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-rank"&gt;(ACB)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit-description"&gt;Navigational authority and stellar mapping division&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="collapsible-section collapsed" id="ncef-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="horizontal-connections"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="horizontal-line"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="connection-node"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="horizontal-line"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="connection-node"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="horizontal-line"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="connection-node"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="horizontal-line"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                            </span></p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="sub-sub-level"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit sub-sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-title"&gt;FLEET OPERATIONS COMMAND&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-rank"&gt;(FOC)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-description"&gt;Day-to-day fleet maneuvers and battle tactics&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                                </span></p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit sub-sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-title"&gt;NAVAL INTELLIGENCE BUREAU&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-rank"&gt;(NIB)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-description"&gt;Espionage, counterintelligence, information warfare&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                                </span></p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit sub-sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-title"&gt;NAVAL RESEARCH DIVISION&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-rank"&gt;(NRD)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-description"&gt;Technological R&amp;D, ship development, energy systems&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                                </span></p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit sub-sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-title"&gt;ASTRAL DOCTRINE BUREAU&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-rank"&gt;(ADB)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-description"&gt;Doctrine development, training curriculum, strategy&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                            </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="branch dlc-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="unit main-branch-unit collapsible" data-target="dlc-section" id="dlc-node"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="unit-title"&gt;DEPARTMENT OF LABOR CORRECTIONS&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="unit-rank"&gt;(DLC)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="unit-description"&gt;Suppressing dissent, optimizing labor force, maintaining socio-political conformity&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button class="llm-button" data-unit="DLC"&gt;✨ Get Strategic Insight&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                </span></p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="collapsible-section collapsed" id="dlc-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="connection-line"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="sub-level" style="flex-wrap: nowrap; justify-content: center; align-items: flex-start;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="unit sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-title"&gt;GENETIC OPTIMIZATION BUREAU&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-rank"&gt;(Head Geneticist)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-description"&gt;Bioengineering of helot classes and augmentation programs&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="unit sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-title"&gt;PRODUCTIVITY OVERSIGHT COMMITTEE&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-rank"&gt;(Productivity Prefect)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-description"&gt;Colony efficiency monitoring and output quotas&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="unit sub-unit collapsible" data-target="internal-security-section" id="internal-security-node"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-title"&gt;DIRECTORATE OF INTERNAL SECURITY&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-rank"&gt;(Director of Internal Security)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="unit-description"&gt;Secret police for subversion and loyalty checks&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="collapsible-section collapsed" id="internal-security-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="connection-line"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="sub-sub-level" style="flex-wrap: nowrap; justify-content: center;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="unit sub-sub-unit no-children"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-title"&gt;COMPLIANCE UNITS&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-rank"&gt;(Chief Compliance Officer)&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;div class="unit-description"&gt;Enforcement teams for riot and uprising suppression&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="llm-modal-overlay" class="modal-overlay"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="modal-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="modal-close-button" id="modal-close-button"&gt;&amp;times;&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 class="modal-title" id="modal-title"&gt;Strategic Insight&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="modal-body" id="modal-body"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="loading-spinner"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="text-center text-gray-400 mt-4"&gt;Generating insight...&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Generate animated stars</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function createStars() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const starsContainer = document.getElementById('stars');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const numStars = 200;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; numStars; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const star = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>star.className = 'star';</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Random position</p>
-<p class="p1"><span class="Apple-converted-space">                </span>star.style.left = Math.random() * 100 + '%';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>star.style.top = Math.random() * 100 + '%';</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Random size</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const size = Math.random() * 3 + 1;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>star.style.width = size + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>star.style.height = size + 'px';</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Random animation duration</p>
-<p class="p1"><span class="Apple-converted-space">                </span>star.style.animationDuration = (Math.random() * 3 + 2) + 's';</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>starsContainer.appendChild(star);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>createStars();</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Collapsible functionality</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Moved setupToggle function inside DOMContentLoaded to ensure it's defined before use</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function setupToggle(nodeId, contentId) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const node = document.getElementById(nodeId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const content = document.getElementById(contentId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const arrow = node.querySelector('.collapsible::after'); // Select the ::after pseudo-element</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (node &amp;&amp; content) { // Removed arrow from check as it's a pseudo-element</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Set initial state to hidden</p>
-<p class="p1"><span class="Apple-converted-space">                </span>content.classList.add('collapsed'); // Use 'collapsed' class for initial state</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>node.addEventListener('click', function(e) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// Prevent click on LLM button from collapsing the section</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (e.target.classList.contains('llm-button')) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>e.stopPropagation();</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const isCollapsed = content.classList.contains('collapsed');</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (isCollapsed) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>// Expand</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>content.classList.remove('collapsed');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>content.classList.add('expanded');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>// Temporarily set max-height to scrollHeight to get actual height, then transition</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>content.style.maxHeight = content.scrollHeight + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>content.style.opacity = '1';</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>content.addEventListener('transitionend', function handler() {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>content.style.maxHeight = '1000px'; // Set to large value after transition</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>content.removeEventListener('transitionend', handler);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}, { once: true });</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>this.classList.remove('collapsed'); // Remove collapsed class from unit to show arrow</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>// Collapse</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>content.style.maxHeight = '0';</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>content.style.opacity = '0';</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>content.addEventListener('transitionend', function handler() {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>content.classList.add('collapsed');</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>content.classList.remove('expanded');</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>content.removeEventListener('transitionend', handler);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}, { once: true });</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>this.classList.add('collapsed'); // Add collapsed class to unit to rotate arrow</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Add hover effects to units</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.querySelectorAll('.unit').forEach(unit =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>unit.addEventListener('mouseenter', function() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>this.style.borderColor = '#ffaa80';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>this.style.boxShadow = '0 0 25px rgba(255, 170, 128, 0.5)';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>unit.addEventListener('mouseleave', function() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (this.classList.contains('main-branch-unit')) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>this.style.borderColor = '#ff8f5a';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else if (this.classList.contains('sub-unit')) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>this.style.borderColor = '#cc5528';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else if (this.classList.contains('sub-sub-unit')) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>this.style.borderColor = '#aa4420';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>this.style.borderColor = '#ff6b35';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>this.style.boxShadow = '0 0 10px rgba(255, 107, 53, 0.2)';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// LLM Integration</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const llmModalOverlay = document.getElementById('llm-modal-overlay');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const modalTitle = document.getElementById('modal-title');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const modalBody = document.getElementById('modal-body');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const modalCloseButton = document.getElementById('modal-close-button');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>modalCloseButton.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>llmModalOverlay.classList.remove('active');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Clear content and show loading spinner for next time</p>
-<p class="p1"><span class="Apple-converted-space">            </span>modalBody.innerHTML = '&lt;div class="loading-spinner"&gt;&lt;/div&gt;&lt;p class="text-center text-gray-400 mt-4"&gt;Generating insight...&lt;/p&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.querySelectorAll('.llm-button').forEach(button =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>button.addEventListener('click', async (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const unitType = e.target.getAttribute('data-unit');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let prompt = "";</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let title = "";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>switch (unitType) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>case "NCAF":</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>title = "NCAF Strategic Overview";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>prompt = "Generate a brief, fictional strategic overview of the New Carolean Armed Forces, considering its role in maintaining autonomy and order in the United Labor Colonies of Democratic New Carolus. Focus on its overall mission and challenges. Keep it concise, around 100-150 words.";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>case "NCNC":</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>title = "NCNC Strategic Analysis";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>prompt = "Provide a concise, fictional strategic analysis of the New Carolean Naval Command (NCNC). Include its primary objectives, potential threats it faces, and its importance to New Carolus's power projection. Keep it concise, around 100-150 words.";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>case "DLC":</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>title = "DLC Strategic Assessment";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>prompt = "Generate a brief, fictional assessment of the Department of Labor Corrections (DLC) from a strategic perspective. Describe its key functions in maintaining internal stability and control within New Carolus, and any inherent challenges. Keep it concise, around 100-150 words.";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>default:</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>title = "Insight";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>prompt = "Generate a fictional strategic insight about this military unit.";</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>modalTitle.textContent = title;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>llmModalOverlay.classList.add('active');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>let chatHistory = [];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>chatHistory.push({ role: "user", parts: [{ text: prompt }] });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const payload = { contents: chatHistory };</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const response = await fetch(apiUrl, {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>method: 'POST',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>headers: { 'Content-Type': 'application/json' },</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>body: JSON.stringify(payload)</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const result = await response.json();</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (result.candidates &amp;&amp; result.candidates.length &gt; 0 &amp;&amp;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>result.candidates[0].content &amp;&amp; result.candidates[0].content.parts &amp;&amp;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>result.candidates[0].content.parts.length &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const text = result.candidates[0].content.parts[0].text;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>modalBody.innerHTML = `&lt;p&gt;${text}&lt;/p&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>modalBody.innerHTML = '&lt;p class="text-red-500"&gt;Error: Could not generate insight. Please try again.&lt;/p&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>console.error("LLM response structure unexpected:", result);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>modalBody.innerHTML = `&lt;p class="text-red-500"&gt;Error: Failed to fetch insight. ${error.message}&lt;/p&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>console.error("Error fetching LLM insight:", error);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('DOMContentLoaded', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Setup toggles for all collapsible units</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setupToggle('ncaf-node', 'ncaf-main-content');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setupToggle('ncnc-node', 'naval-command-content');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setupToggle('high-admiralty-node', 'high-admiralty-content');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setupToggle('ncef-node', 'ncef-section');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setupToggle('dlc-node', 'dlc-section');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setupToggle('internal-security-node', 'internal-security-section');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>UNITED LABOR COLONIES OF DEMOCRATIC NEW CAROLUS</h1>
+            <h2>NEW CAROLEAN ARMED FORCES (NCAF)</h2>
+            <div class="commander">
+                <div class="unit-title">COMMANDER-IN-CHIEF</div>
+                <div class="unit-name">Viceroy Elreon Vyre</div>
+                <div class="unit-rank"><span class="diamond">🔻</span></div>
+            </div>
+        </div>
+
+        <div class="org-chart">
+            <div class="connection-line"></div>
+            
+            <div class="main-level">
+                <div class="branch" style="flex: unset; min-width: unset;">
+                    <div class="unit main-branch-unit collapsible" data-target="ncaf-main-content" id="ncaf-node">
+                        <div class="unit-title">NEW CAROLEAN ARMED FORCES</div>
+                        <div class="unit-rank">(NCAF)</div>
+                        <div class="unit-description">The primary military arm, responsible for all armed forces operations.</div>
+                        <button class="llm-button" data-unit="NCAF">✨ Get Strategic Insight</button>
+                    </div>
+                    
+                    <div class="collapsible-section collapsed" id="ncaf-main-content">
+                        <div class="connection-line"></div>
+                        
+                        <div class="main-level" style="gap: 60px; margin-top: 0;">
+                            <div class="branch naval-section">
+                                <div class="unit main-branch-unit collapsible" data-target="naval-command-content" id="ncnc-node">
+                                    <div class="unit-title">NEW CAROLEAN NAVAL COMMAND</div>
+                                    <div class="unit-name">First Voidlord Jhon Yarthaed</div>
+                                    <div class="unit-rank">(NCNC)</div>
+                                    <div class="unit-description">Primary spacefaring military arm responsible for orbital and deep-space operations</div>
+                                    <button class="llm-button" data-unit="NCNC">✨ Get Strategic Insight</button>
+                                </div>
+                                
+                                <div class="collapsible-section collapsed" id="naval-command-content">
+                                    <div class="connection-line"></div>
+                                    
+                                    <div class="unit main-branch-unit collapsible" data-target="high-admiralty-content" id="high-admiralty-node">
+                                        <div class="unit-title">HIGH ADMIRALTY</div>
+                                        <div class="unit-name">Grand Admiral Célestine Beaufort</div>
+                                        <div class="unit-rank">Strategic Command</div>
+                                        <div class="unit-description">Strategic executive body overseeing all naval operations</div>
+                                    </div>
+
+                                    <div class="collapsible-section collapsed" id="high-admiralty-content">
+                                        <div class="connection-line"></div>
+                                        
+                                        <div class="sub-level" style="flex-wrap: nowrap; justify-content: center; align-items: flex-start;">
+                                            <div class="unit sub-unit no-children">
+                                                <div class="unit-title">ORBITAL DEFENCE FORCE</div>
+                                                <div class="unit-rank">(ODF)</div>
+                                                <div class="unit-description">Defense of core worlds and orbital installations</div>
+                                            </div>
+                                            
+                                            <div class="unit sub-unit collapsible" data-target="ncef-section" id="ncef-node">
+                                                <div class="unit-title">NEW CAROLEAN NAVY</div>
+                                                <div class="unit-rank">EXPEDITIONARY FORCES (NCEF)</div>
+                                                <div class="unit-description">Fleet-based power projection and planetary control</div>
+                                            </div>
+                                            
+                                            <div class="unit sub-unit no-children">
+                                                <div class="unit-title">ASTROCARTOGRAPHY BUREAU</div>
+                                                <div class="unit-name">Honorable Cartographer Jo Kōdōha</div>
+                                                <div class="unit-rank">(ACB)</div>
+                                                <div class="unit-description">Navigational authority and stellar mapping division</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="collapsible-section collapsed" id="ncef-section">
+                                            <div class="horizontal-connections">
+                                                <div class="horizontal-line"></div>
+                                                <div class="connection-node"></div>
+                                                <div class="horizontal-line"></div>
+                                                <div class="connection-node"></div>
+                                                <div class="horizontal-line"></div>
+                                                <div class="connection-node"></div>
+                                                <div class="horizontal-line"></div>
+                                            </div>
+                                            
+                                            <div class="sub-sub-level">
+                                                <div class="unit sub-sub-unit no-children">
+                                                    <div class="unit-title">FLEET OPERATIONS COMMAND</div>
+                                                    <div class="unit-rank">(FOC)</div>
+                                                    <div class="unit-description">Day-to-day fleet maneuvers and battle tactics</div>
+                                                </div>
+                                                
+                                                <div class="unit sub-sub-unit no-children">
+                                                    <div class="unit-title">NAVAL INTELLIGENCE BUREAU</div>
+                                                    <div class="unit-rank">(NIB)</div>
+                                                    <div class="unit-description">Espionage, counterintelligence, information warfare</div>
+                                                </div>
+                                                
+                                                <div class="unit sub-sub-unit no-children">
+                                                    <div class="unit-title">NAVAL RESEARCH DIVISION</div>
+                                                    <div class="unit-rank">(NRD)</div>
+                                                    <div class="unit-description">Technological R&D, ship development, energy systems</div>
+                                                </div>
+                                                
+                                                <div class="unit sub-sub-unit no-children">
+                                                    <div class="unit-title">ASTRAL DOCTRINE BUREAU</div>
+                                                    <div class="unit-rank">(ADB)</div>
+                                                    <div class="unit-description">Doctrine development, training curriculum, strategy</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="branch dlc-section">
+                                <div class="unit main-branch-unit collapsible" data-target="dlc-section" id="dlc-node">
+                                    <div class="unit-title">DEPARTMENT OF LABOR CORRECTIONS</div>
+                                    <div class="unit-rank">(DLC)</div>
+                                    <div class="unit-description">Suppressing dissent, optimizing labor force, maintaining socio-political conformity</div>
+                                    <button class="llm-button" data-unit="DLC">✨ Get Strategic Insight</button>
+                                </div>
+                                
+                                <div class="collapsible-section collapsed" id="dlc-section">
+                                    <div class="connection-line"></div>
+                                    
+                                    <div class="sub-level" style="flex-wrap: nowrap; justify-content: center; align-items: flex-start;">
+                                        <div class="unit sub-unit no-children">
+                                            <div class="unit-title">GENETIC OPTIMIZATION BUREAU</div>
+                                            <div class="unit-rank">(Head Geneticist)</div>
+                                            <div class="unit-description">Bioengineering of helot classes and augmentation programs</div>
+                                        </div>
+                                        
+                                        <div class="unit sub-unit no-children">
+                                            <div class="unit-title">PRODUCTIVITY OVERSIGHT COMMITTEE</div>
+                                            <div class="unit-rank">(Productivity Prefect)</div>
+                                            <div class="unit-description">Colony efficiency monitoring and output quotas</div>
+                                        </div>
+                                        
+                                        <div class="unit sub-unit collapsible" data-target="internal-security-section" id="internal-security-node">
+                                            <div class="unit-title">DIRECTORATE OF INTERNAL SECURITY</div>
+                                            <div class="unit-rank">(Director of Internal Security)</div>
+                                            <div class="unit-description">Secret police for subversion and loyalty checks</div>
+                                        </div>
+                                        
+                                        <div class="collapsible-section collapsed" id="internal-security-section">
+                                            <div class="connection-line"></div>
+                                            <div class="sub-sub-level" style="flex-wrap: nowrap; justify-content: center;">
+                                                <div class="unit sub-sub-unit no-children">
+                                                    <div class="unit-title">COMPLIANCE UNITS</div>
+                                                    <div class="unit-rank">(Chief Compliance Officer)</div>
+                                                    <div class="unit-description">Enforcement teams for riot and uprising suppression</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="llm-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="modal-close-button">&times;</button>
+            <h3 class="modal-title" id="modal-title">Strategic Insight</h3>
+            <div class="modal-body" id="modal-body">
+                <div class="loading-spinner"></div>
+                <p class="text-center text-gray-400 mt-4">Generating insight...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate animated stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numStars = 200;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Random position
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // Random size
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                
+                // Random animation duration
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        createStars();
+        
+        // Collapsible functionality
+        // Moved setupToggle function inside DOMContentLoaded to ensure it's defined before use
+        function setupToggle(nodeId, contentId) {
+            const node = document.getElementById(nodeId);
+            const content = document.getElementById(contentId);
+            const arrow = node.querySelector('.collapsible::after'); // Select the ::after pseudo-element
+
+            if (node && content) { // Removed arrow from check as it's a pseudo-element
+                // Set initial state to hidden
+                content.classList.add('collapsed'); // Use 'collapsed' class for initial state
+                
+                node.addEventListener('click', function(e) {
+                    // Prevent click on LLM button from collapsing the section
+                    if (e.target.classList.contains('llm-button')) {
+                        return;
+                    }
+
+                    e.stopPropagation();
+                    
+                    const isCollapsed = content.classList.contains('collapsed');
+                    
+                    if (isCollapsed) {
+                        // Expand
+                        content.classList.remove('collapsed');
+                        content.classList.add('expanded');
+                        // Temporarily set max-height to scrollHeight to get actual height, then transition
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        content.style.opacity = '1';
+                        content.addEventListener('transitionend', function handler() {
+                            content.style.maxHeight = '1000px'; // Set to large value after transition
+                            content.removeEventListener('transitionend', handler);
+                        }, { once: true });
+                        this.classList.remove('collapsed'); // Remove collapsed class from unit to show arrow
+                    } else {
+                        // Collapse
+                        content.style.maxHeight = '0';
+                        content.style.opacity = '0';
+                        content.addEventListener('transitionend', function handler() {
+                            content.classList.add('collapsed');
+                            content.classList.remove('expanded');
+                            content.removeEventListener('transitionend', handler);
+                        }, { once: true });
+                        this.classList.add('collapsed'); // Add collapsed class to unit to rotate arrow
+                    }
+                });
+            }
+        }
+        
+        // Add hover effects to units
+        document.querySelectorAll('.unit').forEach(unit => {
+            unit.addEventListener('mouseenter', function() {
+                this.style.borderColor = '#ffaa80';
+                this.style.boxShadow = '0 0 25px rgba(255, 170, 128, 0.5)';
+            });
+            
+            unit.addEventListener('mouseleave', function() {
+                if (this.classList.contains('main-branch-unit')) {
+                    this.style.borderColor = '#ff8f5a';
+                } else if (this.classList.contains('sub-unit')) {
+                    this.style.borderColor = '#cc5528';
+                } else if (this.classList.contains('sub-sub-unit')) {
+                    this.style.borderColor = '#aa4420';
+                } else {
+                    this.style.borderColor = '#ff6b35';
+                }
+                this.style.boxShadow = '0 0 10px rgba(255, 107, 53, 0.2)';
+            });
+        });
+
+        // LLM Integration
+        const llmModalOverlay = document.getElementById('llm-modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modalCloseButton = document.getElementById('modal-close-button');
+
+        modalCloseButton.addEventListener('click', () => {
+            llmModalOverlay.classList.remove('active');
+            // Clear content and show loading spinner for next time
+            modalBody.innerHTML = '<div class="loading-spinner"></div><p class="text-center text-gray-400 mt-4">Generating insight...</p>';
+        });
+
+        document.querySelectorAll('.llm-button').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const unitType = e.target.getAttribute('data-unit');
+                let prompt = "";
+                let title = "";
+
+                switch (unitType) {
+                    case "NCAF":
+                        title = "NCAF Strategic Overview";
+                        prompt = "Generate a brief, fictional strategic overview of the New Carolean Armed Forces, considering its role in maintaining autonomy and order in the United Labor Colonies of Democratic New Carolus. Focus on its overall mission and challenges. Keep it concise, around 100-150 words.";
+                        break;
+                    case "NCNC":
+                        title = "NCNC Strategic Analysis";
+                        prompt = "Provide a concise, fictional strategic analysis of the New Carolean Naval Command (NCNC). Include its primary objectives, potential threats it faces, and its importance to New Carolus's power projection. Keep it concise, around 100-150 words.";
+                        break;
+                    case "DLC":
+                        title = "DLC Strategic Assessment";
+                        prompt = "Generate a brief, fictional assessment of the Department of Labor Corrections (DLC) from a strategic perspective. Describe its key functions in maintaining internal stability and control within New Carolus, and any inherent challenges. Keep it concise, around 100-150 words.";
+                        break;
+                    default:
+                        title = "Insight";
+                        prompt = "Generate a fictional strategic insight about this military unit.";
+                }
+
+                modalTitle.textContent = title;
+                llmModalOverlay.classList.add('active');
+
+                try {
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        modalBody.innerHTML = `<p>${text}</p>`;
+                    } else {
+                        modalBody.innerHTML = '<p class="text-red-500">Error: Could not generate insight. Please try again.</p>';
+                        console.error("LLM response structure unexpected:", result);
+                    }
+                } catch (error) {
+                    modalBody.innerHTML = `<p class="text-red-500">Error: Failed to fetch insight. ${error.message}</p>`;
+                    console.error("Error fetching LLM insight:", error);
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup toggles for all collapsible units
+            setupToggle('ncaf-node', 'ncaf-main-content');
+            setupToggle('ncnc-node', 'naval-command-content');
+            setupToggle('high-admiralty-node', 'high-admiralty-content');
+            setupToggle('ncef-node', 'ncef-section');
+            setupToggle('dlc-node', 'dlc-section');
+            setupToggle('internal-security-node', 'internal-security-section');
+        });
+    </script>
 </body>
 </html>
